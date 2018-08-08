@@ -35,6 +35,7 @@ a {
 .content {
     width: auto;
     padding: 40px;
+    min-width: 980px;
 }
 
 .content-collapse {

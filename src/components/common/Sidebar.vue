@@ -24,103 +24,118 @@
 </template>
 
 <script>
-    import bus from '../common/bus';
-    export default {
-        data() {
-            return {
-                collapse: false,
-                items: [
-                    {
-                        icon: 'el-icon-setting',
-                        index: 'dashboard',
-                        title: '首页'
-                    },
-                    {
-                        icon: 'el-icon-tickets',
-                        index: 'table',
-                        title: '习题库'
-                    },
-                    // {
-                    //     icon: 'el-icon-message',
-                    //     index: 'tabs',
-                    //     title: 'tab选项卡'
-                    // },
-                    // {
-                    //     icon: 'el-icon-date',
-                    //     index: '3',
-                    //     title: '表单相关',
-                    //     subs: [
-                    //         {
-                    //             index: 'form',
-                    //             title: '基本表单'
-                    //         },
-                    //         {
-                    //             index: 'editor',
-                    //             title: '富文本编辑器'
-                    //         },
-                    //         {
-                    //             index: 'markdown',
-                    //             title: 'markdown编辑器'
-                    //         },
-                    //         {
-                    //             index: 'upload',
-                    //             title: '文件上传'
-                    //         }
-                    //     ]
-                    // },
-                    // {
-                    //     icon: 'el-icon-star-on',
-                    //     index: 'charts',
-                    //     title: 'schart图表'
-                    // },
-                    // {
-                    //     icon: 'el-icon-rank',
-                    //     index: 'drag',
-                    //     title: '拖拽列表'
-                    // },
-                    {
-                        icon: 'el-icon-warning',
-                        index: 'permission',
-                        title: '权限测试'
-                    }
-                    // {
-                    //     icon: 'el-icon-error',
-                    //     index: '404',
-                    //     title: '404页面'
-                    // }
-                ]
-            }
+import bus from '../common/bus';
+export default {
+  data() {
+    return {
+      collapse: false,
+      items: [
+        {
+          icon: 'el-icon-setting',
+          index: 'dashboard',
+          title: '首页'
         },
-        computed:{
-            onRoutes(){
-                return this.$route.path.replace('/','');
+        {
+          icon: 'el-icon-tickets',
+          index: '1',
+          title: '习题库',
+          subs: [
+            {
+              index: 'qsdatas',
+              title: '习题数据'
             }
+            // {
+            //     index: 'qstypes',
+            //     title: '习题类型'
+            // }
+          ]
         },
-        created(){
-            // 通过 Event Bus 进行组件间通信，来折叠侧边栏
-            bus.$on('collapse', msg => {
-                this.collapse = msg;
-            })
+        {
+          icon: 'el-icon-message',
+          index: 'userlist',
+          title: '用户管理'
+        },
+        // {
+        //     icon: 'el-icon-message',
+        //     index: 'tabs',
+        //     title: 'tab选项卡'
+        // },
+        // {
+        //     icon: 'el-icon-date',
+        //     index: '3',
+        //     title: '表单相关',
+        //     subs: [
+        //         {
+        //             index: 'form',
+        //             title: '基本表单'
+        //         },
+        //         {
+        //             index: 'editor',
+        //             title: '富文本编辑器'
+        //         },
+        //         {
+        //             index: 'markdown',
+        //             title: 'markdown编辑器'
+        //         },
+        //         {
+        //             index: 'upload',
+        //             title: '文件上传'
+        //         }
+        //     ]
+        // },
+        // {
+        //     icon: 'el-icon-star-on',
+        //     index: 'charts',
+        //     title: 'schart图表'
+        // },
+        // {
+        //     icon: 'el-icon-rank',
+        //     index: 'drag',
+        //     title: '拖拽列表'
+        // },
+        {
+          icon: 'el-icon-warning',
+          index: 'permission',
+          title: '权限测试'
         }
+        // {
+        //     icon: 'el-icon-error',
+        //     index: '404',
+        //     title: '404页面'
+        // }
+      ]
+    };
+  },
+  computed: {
+    onRoutes() {
+      return this.$route.path.replace('/', '');
     }
+  },
+  created() {
+    // 通过 Event Bus 进行组件间通信，来折叠侧边栏
+    bus.$on('collapse', msg => {
+      this.collapse = msg;
+    });
+  }
+};
 </script>
 
 <style scoped>
-    .sidebar{
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 70px;
-        bottom:0;
-        overflow-y: scroll;
-    }
-    .sidebar::-webkit-scrollbar{
-        width: 0;
-    }
-    .sidebar-el-menu:not(.el-menu--collapse){
-        width: 250px;
-    }
-    .sidebar > ul {
-        height:100%;
-    }
+.sidebar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 70px;
+  bottom: 0;
+  overflow-y: scroll;
+}
+.sidebar::-webkit-scrollbar {
+  width: 0;
+}
+.sidebar-el-menu:not(.el-menu--collapse) {
+  width: 250px;
+}
+.sidebar > ul {
+  height: 100%;
+}
 </style>

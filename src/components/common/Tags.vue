@@ -61,6 +61,7 @@
                 const isExist = this.tagsList.some(item => {
                     return item.path === route.fullPath;
                 })
+                
                 !isExist && this.tagsList.push({
                     title: route.meta.title,
                     path: route.fullPath,
