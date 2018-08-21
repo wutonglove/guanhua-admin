@@ -7,9 +7,9 @@ export default function(data, url) {
             .post(url, data)
             .then(function(response) {
                 let code = response.data.code;
-                if (code === RESPONSE_OK) {
+                if (+code === RESPONSE_OK) {
                     resolve(data);
-                } else if (code === '-1'){
+                } else if (+code === -1){
                     reject('用户名已经存在');
                 }
             })

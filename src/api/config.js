@@ -1,1 +1,1 @@
-export const RESPONSE_OK = '0';
+export const RESPONSE_OK = 0;

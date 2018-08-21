@@ -3,23 +3,36 @@
         <div class="container">
             <div class="control_box">
                 <el-button type="danger" icon="el-icon-delete" class="handle-del" @click="delAll">批量删除</el-button>
-                <el-button type="primary" icon="el-icon-plus" class="handle-del rt" @click="register">注册新用户</el-button>
+                <el-button type="primary" icon="el-icon-plus" class="handle-del rt" @click="register" v-if="role!='SAdmin'">注册新用户</el-button>
             </div>
-            <el-table :data="data" border style="width: 100%" ref="multipleTable" :row-style="rowStyle" @selection-change="handleSelectionChange">
+            <el-table :data="tableData" border style="width: 100%" ref="multipleTable" :row-style="rowStyle" @selection-change="handleSelectionChange" v-if="role === 'SAdmin'">
+                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column prop="id" label="ID" width="80">
+                </el-table-column>
+                <el-table-column prop="name" label="学校">
+                </el-table-column>
+                <el-table-column label="操作" width="80">
+                    <template slot-scope="scope">
+                        <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!-- 表2 -->
+            <el-table :data="tableData" border style="width: 100%" ref="multipleTable" :row-style="rowStyle" @selection-change="handleSelectionChange" v-else>
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="name" label="姓名" width="80">
                 </el-table-column>
-                <el-table-column prop="username" label="用户名" width="80">
+                <el-table-column prop="id" label="用户名" width="80">
                 </el-table-column>
                 <el-table-column prop="gender" label="性别" width="50">
                 </el-table-column>
-                <el-table-column prop="kumu" label="科目" width="120">
+                <el-table-column prop="kemu" label="科目" width="120">
                 </el-table-column>
                 <el-table-column prop="school" label="学校">
                 </el-table-column>
-                <el-table-column prop="school" label="手机号">
+                <el-table-column prop="mobile" label="手机号">
                 </el-table-column>
-                <el-table-column prop="school" label="邮箱">
+                <el-table-column prop="email" label="邮箱">
                 </el-table-column>
                 <el-table-column label="操作" width="150">
                     <template slot-scope="scope">
@@ -29,7 +42,7 @@
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next" :total="100">
+                <el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next" :total="tableData.length">
                 </el-pagination>
             </div>
         </div>
@@ -47,12 +60,17 @@
 
 <script>
 import bus from '@/components/common/bus';
+import getSchoolList from '@/api/getSchoolList';
+import getTeacherList from '@/api/getTeacherList';
+import km from '@/data/kemu.json';
+
 export default {
   name: 'userlist',
   data() {
     return {
       url: './static/vuetable.json',
       tableData: [],
+      total: 0,
       cur_page: 1,
       multipleSelection: [],
       select_cate: '',
@@ -104,30 +122,34 @@ export default {
       }
     };
   },
-  created() {
+  mounted() {
     this.getData();
   },
   computed: {
-    data() {
-      return this.tableData.filter(d => {
-        let is_del = false;
-        for (let i = 0; i < this.del_list.length; i++) {
-          if (d.name === this.del_list[i].name) {
-            is_del = true;
-            break;
-          }
-        }
-        if (!is_del) {
-          if (
-            d.address.indexOf(this.select_cate) > -1 &&
-            (d.name.indexOf(this.select_word) > -1 ||
-              d.address.indexOf(this.select_word) > -1)
-          ) {
-            return d;
-          }
-        }
-      });
+    role() {
+      return bus.userinfo.role;
     }
+    // data() {
+    //   console.log(this.del_list, this.select_cate, this.select_word);
+    //   return this.tableData.filter(d => {
+    //     let is_del = false;
+    //     for (let i = 0; i < this.del_list.length; i++) {
+    //       if (d.name === this.del_list[i].name) {
+    //         is_del = true;
+    //         break;
+    //       }
+    //     }
+    //     if (!is_del) {
+    //       if (
+    //         d.address.indexOf(this.select_cate) > -1 &&
+    //         (d.name.indexOf(this.select_word) > -1 ||
+    //           d.address.indexOf(this.select_word) > -1)
+    //       ) {
+    //         return d;
+    //       }
+    //     }
+    //   });
+    // }
   },
   methods: {
     rowStyle({ row, rowIndex }) {
@@ -141,16 +163,53 @@ export default {
     // 获取 easy-mock 的模拟数据
     getData() {
       // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
-      if (process.env.NODE_ENV === 'development') {
-        this.url = '/ms/table/list';
-      }
-      this.$axios
-        .post(this.url, {
-          page: this.cur_page
+      // if (process.env.NODE_ENV === 'development') {
+      //   this.url = '/ms/table/list';
+      // }
+      // this.$axios
+      //   .post(this.url, {
+      //     page: this.cur_page
+      //   })
+      //   .then(res => {
+      //     this.tableData = res.data.list;
+      //   });
+      this.tableData = [];
+      if (this.role === 'SAdmin') {
+        getSchoolList()
+          .then(data => {
+            this.tableData = data;
+          })
+          .catch(e => {
+            this.$alert(err, '', {
+              confirmButtonText: '确定'
+            });
+          });
+      } else if (this.role === 'Admin') {
+        let schoolid = +bus.userinfo.schoolid;
+        getTeacherList({
+          schoolid
         })
-        .then(res => {
-          this.tableData = res.data.list;
-        });
+          .then(data => {
+            this.tableData = data.map(item => {
+              let kemu = [];
+              for (let key in item) {
+                if (/kemu\d+/.test(key)) {
+                  if (km[item[key]]) kemu.push(km[item[key]]);
+                }
+              }
+              return {
+                name: item.name,
+                id: item.id,
+                gender: item.gender === 1 ? '男' : '女',
+                email: item.email,
+                mobile: item.mobile,
+                school: '',
+                kemu: kemu.join('、')
+              };
+            });
+          })
+          .catch(() => {});
+      }
     },
     search() {
       this.is_search = true;
@@ -199,7 +258,7 @@ export default {
     },
     courseidSelected() {},
     register() {
-      bus.userinfo.role === 'Teacher'
+      this.role === 'Teacher'
         ? this.$router.push('/adduser2')
         : this.$router.push('/adduser1');
     }

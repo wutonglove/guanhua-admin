@@ -7,7 +7,7 @@ export default function(data) {
         axios
             .post(url, data)
             .then(function(response) {
-                if (response.data.code === RESPONSE_OK) {
+                if (+response.data.code === RESPONSE_OK) {
                     resolve(response.data);
                 } else {
                     reject(response.data.data);
