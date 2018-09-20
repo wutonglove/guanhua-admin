@@ -32,6 +32,8 @@ router.beforeEach((to, from, next) => {
             case '/qsdatas':
                 role === 'Teacher' ? next() : next('/403');
                 break;
+            case '/userlist':
+                role === 'Student' ? next('/403') : next();
             default:
                 next();
         }

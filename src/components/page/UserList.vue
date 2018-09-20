@@ -3,7 +3,8 @@
         <div class="container">
             <div class="control_box">
                 <el-button type="danger" icon="el-icon-delete" class="handle-del" @click="delAll">批量删除</el-button>
-                <el-button type="primary" icon="el-icon-plus" class="handle-del rt" @click="register" v-if="role!='SAdmin'">注册新用户</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="query">查询</el-button>
+                <el-button type="primary" icon="el-icon-plus" class="rt" @click="register" v-if="role!='SAdmin'">注册新用户</el-button>
             </div>
             <el-table :data="tableData" border style="width: 100%" ref="multipleTable" :row-style="rowStyle" @selection-change="handleSelectionChange" v-if="role === 'SAdmin'">
                 <el-table-column type="selection" width="55"></el-table-column>
@@ -41,10 +42,10 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="pagination">
+            <!-- <div class="pagination">
                 <el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next" :total="tableData.length">
                 </el-pagination>
-            </div>
+            </div> -->
         </div>
 
         <!-- 删除提示框 -->
@@ -62,7 +63,7 @@
 import bus from '@/components/common/bus';
 import getSchoolList from '@/api/getSchoolList';
 import getTeacherList from '@/api/getTeacherList';
-import km from '@/data/kemu.json';
+import kmLs from '@/data/kemu.json';
 
 export default {
   name: 'userlist',
@@ -122,57 +123,26 @@ export default {
       }
     };
   },
-  mounted() {
-    this.getData();
-  },
   computed: {
     role() {
       return bus.userinfo.role;
     }
-    // data() {
-    //   console.log(this.del_list, this.select_cate, this.select_word);
-    //   return this.tableData.filter(d => {
-    //     let is_del = false;
-    //     for (let i = 0; i < this.del_list.length; i++) {
-    //       if (d.name === this.del_list[i].name) {
-    //         is_del = true;
-    //         break;
-    //       }
-    //     }
-    //     if (!is_del) {
-    //       if (
-    //         d.address.indexOf(this.select_cate) > -1 &&
-    //         (d.name.indexOf(this.select_word) > -1 ||
-    //           d.address.indexOf(this.select_word) > -1)
-    //       ) {
-    //         return d;
-    //       }
-    //     }
-    //   });
-    // }
   },
   methods: {
+    query() {
+      this.getData();
+    },
     rowStyle({ row, rowIndex }) {
       return rowIndex % 2 === 0 ? 'background-color: rgb(245,245,245)' : '';
     },
     // 分页导航
     handleCurrentChange(val) {
       this.cur_page = val;
+      console.log(val);
       this.getData();
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
-      // if (process.env.NODE_ENV === 'development') {
-      //   this.url = '/ms/table/list';
-      // }
-      // this.$axios
-      //   .post(this.url, {
-      //     page: this.cur_page
-      //   })
-      //   .then(res => {
-      //     this.tableData = res.data.list;
-      //   });
       this.tableData = [];
       if (this.role === 'SAdmin') {
         getSchoolList()
@@ -194,7 +164,10 @@ export default {
               let kemu = [];
               for (let key in item) {
                 if (/kemu\d+/.test(key)) {
-                  if (km[item[key]]) kemu.push(km[item[key]]);
+                  let v = kmLs.findIndex(ke => {
+                    return ke.code === item[key];
+                  });
+                  if (v !== -1) kemu.push(kmLs[v].name);
                 }
               }
               return {
@@ -203,7 +176,7 @@ export default {
                 gender: item.gender === 1 ? '男' : '女',
                 email: item.email,
                 mobile: item.mobile,
-                school: '',
+                school: item.schoolname,
                 kemu: kemu.join('、')
               };
             });
@@ -261,6 +234,11 @@ export default {
       this.role === 'Teacher'
         ? this.$router.push('/adduser2')
         : this.$router.push('/adduser1');
+    }
+  },
+  watch: {
+    $route(now, old) {
+      if (old.path === '/adduser1') this.getData();
     }
   }
 };

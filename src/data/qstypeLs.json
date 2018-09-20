@@ -1,1 +1,147 @@
-["单选题","多选题","填空题"]
+[
+    {
+        "code": 0,
+        "name": "单选题",
+        "type": "radio"
+    },
+    {
+        "code": 1,
+        "name": "多选题",
+        "type": "checkbox"
+    },
+    {
+        "code": 2,
+        "name": "填空题",
+        "type": "fillblank"
+    },
+    {
+        "code": 3,
+        "name": "判断题",
+        "type": "judge"
+    },
+    {
+        "code": 4,
+        "name": "投票题",
+        "type": "vote"
+    },
+    {
+        "code": 5,
+        "name": "排序题",
+        "type": "sort"
+    },
+    {
+        "code": 6,
+        "name": "拼图题",
+        "type": "jigsaw"
+    },
+    {
+        "code": 7,
+        "name": "问答题",
+        "type": "subjective"
+    },
+    {
+        "code": 8,
+        "name": "复合题",
+        "type": "comprehensive"
+    },
+    {
+        "code": 9,
+        "name": "手写题",
+        "type": "handwrite"
+    },
+    {
+        "code": 12,
+        "name": "记忆卡片",
+        "type": "memory-card"
+    },
+    {
+        "code": 11,
+        "name": "分类表格",
+        "type": "classify-tab"
+    },
+    {
+        "code": 13,
+        "name": "分类题",
+        "type": "classify"
+    },
+    {
+        "code": 15,
+        "name": "选词填空",
+        "type": "blank-cloze"
+    },
+    {
+        "code": 16,
+        "name": "文本选择",
+        "type": "textselect"
+    },
+    {
+        "code": 17,
+        "name": "排序题",
+        "type": "order"
+    },
+    {
+        "code": 18,
+        "name": "思维导图",
+        "type": "mind-map"
+    },
+    {
+        "code": 19,
+        "name": "猜词游戏",
+        "type": "word-guess"
+    },
+    {
+        "code": 20,
+        "name": "比较大小",
+        "type": "compare"
+    },
+    {
+        "code": 21,
+        "name": "分式加减",
+        "type": "fractional-calc"
+    },
+    {
+        "code": 22,
+        "name": "竖式计算",
+        "type": "vertical-calc"
+    },
+    {
+        "code": 23,
+        "name": "区间题",
+        "type": "interval"
+    },
+    {
+        "code": 29,
+        "name": "魔方盒游戏",
+        "type": "rubik-box"
+    },
+    {
+        "code": 30,
+        "name": "字谜游戏",
+        "type": "logogriph"
+    },
+    {
+        "code": 26,
+        "name": "--连字成诗",
+        "type": "spelling-poem"
+    },
+    {
+        "code": 27,
+        "name": "标点题",
+        "type": "punctuation"
+    },
+    {
+        "code": 28,
+        "name": "作文题",
+        "type": "composition"
+    },
+    {
+        "code": 31,
+        "name": "英语篇章发音评测",
+        "type": "en-pronounce"
+    },
+    {
+        "code": 32,
+        "name": "连连看",
+        "type": "link-game"
+    }
+]

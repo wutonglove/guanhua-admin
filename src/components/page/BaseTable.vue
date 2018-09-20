@@ -2,10 +2,18 @@
     <div class="table">
         <div class="container">
             <div class="handle-box">
-                <el-select v-model="select_cate" placeholder="习题类型" class="handle-select mr10">
-                    <el-option :key="index" :label="item" :value="item" v-for="(item,index) in qstypeLs"></el-option>
+                <!-- <el-select v-model="select_cate" placeholder="习题类型" class="handle-select mr10">
+                    <el-option :key="index" :label="item" :value="item" v-for="(item,index) in queryData.qstypeLs"></el-option>
+                </el-select> -->
+                <el-select v-model="select_kemu" placeholder="科目" class="handle-select mr10">
+                    <el-option label="全部" value=""></el-option>
+                    <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in queryData.kemuLs"></el-option>
                 </el-select>
-                <el-date-picker
+                <el-select v-model="select_grade" placeholder="学阶" class="handle-select mr10">
+                    <el-option label="全部" value=""></el-option>
+                    <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in queryData.gradeLs"></el-option>
+                </el-select>
+                <!-- <el-date-picker
                   class="time-picker mr10"
                   v-model="time"
                   type="datetimerange"
@@ -23,9 +31,9 @@
                     v-model="selectedCourseid"
                     @change="courseidSelected"
                     placeholder="请选择课程">
-                </el-cascader>
-                <el-input v-model="select_word" placeholder="创建用户" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
+                </el-cascader> -->
+                <el-input v-model="select_creator" placeholder="创建者" class="handle-input mr10"></el-input>
+                <el-button type="primary" icon="el-icon-search" @click.prevent.stop="search">查询</el-button>
             </div>
             <div class="control_box">
                 <el-button type="danger" icon="el-icon-delete" class="handle-del" @click="delAll">批量删除</el-button>
@@ -33,49 +41,36 @@
             </div>
             <el-table :data="data" border style="width: 100%" ref="multipleTable" :row-style="rowStyle" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="date" label="日期" sortable width="150">
+                <el-table-column prop="modify_time" label="日期" width="150" :sortable="true">
                 </el-table-column>
-                <el-table-column prop="name" label="习题类型" width="120">
+                <el-table-column prop="grade" label="学阶" width="80" :sortable="true" :show-overflow-tooltip="true">
                 </el-table-column>
-                <el-table-column prop="name" label="创建用户" width="120">
+                <el-table-column prop="subject" label="科目" width="80" :show-overflow-tooltip="true">
                 </el-table-column>
-                <el-table-column prop="address" label="习题数据" :formatter="formatter">
+                <el-table-column prop="xttype" label="习题类型" width="80" :show-overflow-tooltip="true">>
+                </el-table-column>
+                <el-table-column prop="creator" label="创建者" width="80" :show-overflow-tooltip="true">
+                </el-table-column>
+                <el-table-column prop="maincontent" label="习题内容" min-width="200" :show-overflow-tooltip="true">
+                </el-table-column>
+                <el-table-column prop="name" label=".." :show-overflow-tooltip="true">
                 </el-table-column>
                 <el-table-column label="操作" width="150">
                     <template slot-scope="scope">
-                        <!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
-                        <el-button size="small" @click="openQS">预览</el-button>
+                        <!-- <el-button size="small" @click="">编辑</el-button> -->
+                        <el-button size="small" @click="openQS(scope.row)">预览</el-button>
                         <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next" :total="1000">
+                <el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next" :total="10">
                 </el-pagination>
             </div>
         </div>
 
-        <!-- 编辑弹出框 -->
-        <!-- <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="50px">
-                <el-form-item label="日期">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="form.date" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
-                </el-form-item>
-                <el-form-item label="姓名">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form.address"></el-input>
-                </el-form-item>
-
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
-        </el-dialog> -->
         <el-dialog title="预览" :visible.sync="preVisible" width="80%" center>
-            <iframe src="http://www.baidu.com" frameborder="0" class="preview_box" sandbox></iframe>
+            <iframe :src="previewUrl" frameborder="0" class="preview_box" sandbox></iframe>
         </el-dialog>
 
         <!-- 删除提示框 -->
@@ -91,26 +86,29 @@
 
 <script>
 import qstypeLs from '@/data/qstypeLs.json';
+import gradeLs from '@/data/grade.json';
+import kemuLs from '@/data/kemu.json';
+
+import getQSList from '@/api/getQSList';
+
 export default {
   name: 'basetable',
   data() {
     return {
-      url: './static/vuetable.json',
+      queryData: {
+        qstypeLs,
+        gradeLs,
+        kemuLs
+      },
       tableData: [],
-      cur_page: 1,
       multipleSelection: [],
       select_cate: '',
-      select_word: '',
+      select_kemu: '',
+      select_grade: '',
+      select_creator: '',
       del_list: [],
-      is_search: false,
-      //   editVisible: false,
       preVisible: false,
       delVisible: false,
-      form: {
-        name: '',
-        date: '',
-        address: ''
-      },
       idx: -1,
       courseidList: [],
       selectedCourseid: [],
@@ -146,31 +144,32 @@ export default {
           }
         ]
       },
-      qstypeLs: qstypeLs
+      cur_page: 1,
+      previewUrl: ''
     };
-  },
-  created() {
-    // this.getData();
   },
   computed: {
     data() {
-      return this.tableData.filter(d => {
-        let is_del = false;
-        for (let i = 0; i < this.del_list.length; i++) {
-          if (d.name === this.del_list[i].name) {
-            is_del = true;
-            break;
-          }
-        }
-        if (!is_del) {
-          if (
-            d.address.indexOf(this.select_cate) > -1 &&
-            (d.name.indexOf(this.select_word) > -1 ||
-              d.address.indexOf(this.select_word) > -1)
-          ) {
-            return d;
-          }
-        }
+      return this.tableData.map(item => {
+        let _grade = gradeLs.find(g => {
+          return +item.grade === +g.code;
+        });
+        let _xttype = qstypeLs.find(t => {
+          return +item.xttype === +t.code;
+        });
+        let _subject = kemuLs.find(k => {
+          return +item.subject === +k.code;
+        });
+        return {
+          courseid: item.courseid,
+          creator: item.creator,
+          modify_time: item.modify_time,
+          questionid: item.questionid,
+          maincontent: item.maincontent,
+          grade: _grade && _grade.name,
+          subject: _subject && _subject.name,
+          xttype: _xttype && _xttype.name
+        };
       });
     }
   },
@@ -184,38 +183,24 @@ export default {
       this.getData();
     },
     // 获取 easy-mock 的模拟数据
-    getData() {
-      // // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
-      // if (process.env.NODE_ENV === 'development') {
-      //   this.url = '/ms/table/list';
-      // }
-      // this.$axios
-      //   .post(this.url, {
-      //     page: this.cur_page
-      //   })
-      //   .then(res => {
-      //     this.tableData = res.data.list;
-      //   });
+    getData({ start = 0, num = 10, subject, grade }) {
+      getQSList({
+        subject: subject < 1 ? undefined : subject,
+        grade: grade < 1 ? undefined : grade,
+        start,
+        num
+      })
+        .then(data => {
+          this.tableData = data;
+        })
+        .catch(e => {
+          this.$alert(err, '', {
+            confirmButtonText: '确定'
+          });
+        });
     },
     search() {
-      // this.is_search = true;
-      this.getData();
-    },
-    formatter(row, column) {
-      return row.address;
-    },
-    filterTag(value, row) {
-      return row.tag === value;
-    },
-    handleEdit(index, row) {
-      this.idx = index;
-      const item = this.tableData[index];
-      this.form = {
-        name: item.name,
-        date: item.date,
-        address: item.address
-      };
-      this.editVisible = true;
+      this.getData({ subject: +this.select_kemu, grade: +this.select_grade });
     },
     handleDelete(index, row) {
       this.idx = index;
@@ -234,12 +219,6 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    // 保存编辑
-    saveEdit() {
-      this.$set(this.tableData, this.idx, this.form);
-      this.editVisible = false;
-      this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-    },
     // 确定删除
     deleteRow() {
       this.tableData.splice(this.idx, 1);
@@ -248,10 +227,11 @@ export default {
     },
     courseidSelected() {},
     createQS() {
-      window.open('https://baidu.com', '_blank');
+      window.open('www.baidu.com' , '_blank');
     },
-    openQS() {
+    openQS(op) {
       this.preVisible = true;
+      this.previewUrl = '/api/xiti/preview.html#/' + op.questionid;
     }
   }
 };
@@ -268,7 +248,7 @@ export default {
   width: 130px;
   display: inline-block;
 }
-.time-picker{
+.time-picker {
   width: 260px;
 }
 .del-dialog-cnt {
@@ -282,7 +262,7 @@ export default {
 .rt {
   float: right;
 }
-.mr10{
+.mr10 {
   margin-right: 10px;
 }
 .preview_box {

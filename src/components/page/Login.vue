@@ -61,9 +61,10 @@ export default {
               bus.userinfo = {
                 uid: userinfo[0],
                 uname: userinfo[1],
-                schoolid: userinfo[18],
+                schoolid: userinfo[19],
                 role: userinfo[10]
               }
+              console.log(bus.userinfo);
               this.$router.push('/');
             })
             .catch(err => {

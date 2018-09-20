@@ -37,7 +37,7 @@ export default {
         },
         {
           icon: 'el-icon-tickets',
-          index: '1',
+          index: 'qsbase',
           title: '习题库',
           subs: [
             {
@@ -105,6 +105,29 @@ export default {
         // }
       ]
     };
+  },
+  mounted() {
+    let role = bus.userinfo.role;
+    switch (role) {
+      case 'Teacher':
+        {
+          // teacher 没有查询用户权限
+          let index = this.items.findIndex(item => {
+            return item.index === 'userlist';
+          });
+          this.items.splice(index, 1);
+        }
+        break;
+      case 'Admin':
+        {
+          // 学校管理没有查询习题权限
+          let index = this.items.findIndex(item => {
+            return item.index === 'qsbase';
+          });
+          this.items.splice(index, 1);
+        }
+        break;
+    }
   },
   computed: {
     onRoutes() {

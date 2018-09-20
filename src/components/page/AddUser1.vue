@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import km from '@/data/kemu.json';
+import kmLs from '@/data/kemu.json';
 import register from '@/api/register';
 import bus from '@/components/common/bus';
 
@@ -96,17 +96,6 @@ export default {
         callback(new Error('邮箱格式不正确'));
       }
     };
-    // 处理科目list
-    let _list = [];
-    for (let key in km) {
-      _list.push({
-        code: key,
-        name: km[key]
-      });
-    }
-    _list = _list.sort((a, b) => {
-      return a.code - b.code;
-    });
     return {
       form: {
         userid: '',
@@ -180,7 +169,7 @@ export default {
           }
         ]
       },
-      list: _list,
+      list: kmLs,
       valid: false
     };
   },
