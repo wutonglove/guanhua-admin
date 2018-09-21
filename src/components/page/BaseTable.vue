@@ -5,6 +5,14 @@
                 <!-- <el-select v-model="select_cate" placeholder="习题类型" class="handle-select mr10">
                     <el-option :key="index" :label="item" :value="item" v-for="(item,index) in queryData.qstypeLs"></el-option>
                 </el-select> -->
+                <el-cascader
+                  ref="courseCom"
+                  expand-trigger="hover"
+                  :filterable="true"
+                  :options="queryData.courseLs"
+                  v-model="select_course"
+                  @change="selectCourse">
+                </el-cascader>
                 <el-select v-model="select_kemu" placeholder="科目" class="handle-select mr10">
                     <el-option label="全部" value=""></el-option>
                     <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in queryData.kemuLs"></el-option>
@@ -88,8 +96,20 @@
 import qstypeLs from '@/data/qstypeLs.json';
 import gradeLs from '@/data/grade.json';
 import kemuLs from '@/data/kemu.json';
+import _courseLs from '@/data/course.json';
 
 import getQSList from '@/api/getQSList';
+import bus from '@/components/common/bus';
+
+function courseFormat(arr) {
+  return arr.map(value => {
+    return {
+      value: value.code,
+      label: value.name,
+      children: value.data.length > 0 ? courseFormat(value.data) : undefined
+    };
+  });
+}
 
 export default {
   name: 'basetable',
@@ -98,7 +118,8 @@ export default {
       queryData: {
         qstypeLs,
         gradeLs,
-        kemuLs
+        kemuLs,
+        courseLs: courseFormat(_courseLs)
       },
       tableData: [],
       multipleSelection: [],
@@ -106,6 +127,7 @@ export default {
       select_kemu: '',
       select_grade: '',
       select_creator: '',
+      select_course: [],
       del_list: [],
       preVisible: false,
       delVisible: false,
@@ -182,7 +204,6 @@ export default {
       this.cur_page = val;
       this.getData();
     },
-    // 获取 easy-mock 的模拟数据
     getData({ start = 0, num = 10, subject, grade }) {
       getQSList({
         subject: subject < 1 ? undefined : subject,
@@ -201,6 +222,10 @@ export default {
     },
     search() {
       this.getData({ subject: +this.select_kemu, grade: +this.select_grade });
+    },
+    // 选择课程
+    selectCourse() {
+      console.log(this.select_course);
     },
     handleDelete(index, row) {
       this.idx = index;
@@ -227,7 +252,19 @@ export default {
     },
     courseidSelected() {},
     createQS() {
-      window.open('www.baidu.com' , '_blank');
+      if (this.select_course.length < 3) {
+        this.$message.error('请先选择课程');
+        return;
+      }
+      let grade = this.select_course[0];
+      let subject = this.select_course[1];
+      let courseid = this.select_course[this.select_course.length - 1];
+      this.$confirm(`确认创建【${this.$refs.courseCom.currentLabels.join('-')}】的习题？`)
+        .then(_ => {
+          let url = `http://47.94.131.70:8800/api/xiti/edit.html#/new/home?grade=${grade}&subject=${subject}&courseid=${courseid}&creator=${bus.userinfo.uid}`;
+          window.open(url, '_blank');
+        })
+        .catch(() => {});
     },
     openQS(op) {
       this.preVisible = true;

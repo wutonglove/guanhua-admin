@@ -21,9 +21,9 @@
             <!-- 表2 -->
             <el-table :data="tableData" border style="width: 100%" ref="multipleTable" :row-style="rowStyle" @selection-change="handleSelectionChange" v-else>
                 <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="name" label="姓名" width="80">
+                <el-table-column prop="name" label="姓名" width="120">
                 </el-table-column>
-                <el-table-column prop="id" label="用户名" width="80">
+                <el-table-column prop="id" label="用户名" width="180">
                 </el-table-column>
                 <el-table-column prop="gender" label="性别" width="50">
                 </el-table-column>
