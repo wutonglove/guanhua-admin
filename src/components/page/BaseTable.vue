@@ -78,7 +78,7 @@
         </div>
 
         <el-dialog title="预览" :visible.sync="preVisible" width="80%" center>
-            <iframe :src="previewUrl" frameborder="0" class="preview_box" sandbox></iframe>
+            <iframe :src="previewUrl" frameborder="0" class="preview_box"></iframe>
         </el-dialog>
 
         <!-- 删除提示框 -->
