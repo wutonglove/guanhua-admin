@@ -8,7 +8,7 @@ export default function(data) {
             .post(url, data)
             .then(response => {
                 if (+response.data.code === RESPONSE_OK)
-                    resolve(response.data.data);
+                    resolve(response.data);
                 else reject('请求失败！');
             })
             .catch(() => {

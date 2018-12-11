@@ -5,14 +5,14 @@
                 <!-- <el-select v-model="select_cate" placeholder="习题类型" class="handle-select mr10">
                     <el-option :key="index" :label="item" :value="item" v-for="(item,index) in queryData.qstypeLs"></el-option>
                 </el-select> -->
-                <el-cascader
+                <!-- <el-cascader
                   ref="courseCom"
                   expand-trigger="hover"
                   :filterable="true"
                   :options="queryData.courseLs"
                   v-model="select_course"
                   @change="selectCourse">
-                </el-cascader>
+                </el-cascader> -->
                 <el-select v-model="select_kemu" placeholder="科目" class="handle-select mr10">
                     <el-option label="全部" value=""></el-option>
                     <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in queryData.kemuLs"></el-option>
@@ -72,7 +72,7 @@
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next" :total="10">
+                <el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next" :total="row" v-if="row>0">
                 </el-pagination>
             </div>
         </div>
@@ -167,7 +167,9 @@ export default {
         ]
       },
       cur_page: 1,
-      previewUrl: ''
+      previewUrl: '',
+      row: 0
+
     };
   },
   computed: {
@@ -202,7 +204,8 @@ export default {
     // 分页导航
     handleCurrentChange(val) {
       this.cur_page = val;
-      this.getData();
+      let start = val * 10;
+      this.getData({ start, subject: +this.select_kemu, grade: +this.select_grade});
     },
     getData({ start = 0, num = 10, subject, grade }) {
       getQSList({
@@ -212,7 +215,8 @@ export default {
         num
       })
         .then(data => {
-          this.tableData = data;
+          this.tableData = data.data;
+          this.row = data.row;
         })
         .catch(e => {
           this.$alert(err, '', {
